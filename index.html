@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>优秀销售经验闯关H5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+    <style>
+        .animate-correct {
+            animation: correct 0.5s ease-in-out;
+        }
+        .animate-error {
+            animation: error 0.5s ease-in-out;
+        }
+        @keyframes correct {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background-color: #dcfce7; }
+            100% { transform: scale(1); }
+        }
+        @keyframes error {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); background-color: #fee2e2; }
+            100% { transform: scale(1); }
+        }
+        /* 核心修复：强制隐藏所有页面 */
+        .page {
+            display: none !important;
+            animation: fadeIn 0.8s ease;
+        }
+        /* 只有加了active的页面才显示 */
+        .page.active {
+            display: flex !important;
+            flex-direction: column;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen p-0 m-0">
+    <!-- 封面页：默认显示（加了active） -->
+    <div id="page1" class="page active items-center justify-center p-6 h-screen box-border">
+        <img src="https://picsum.photos/200/200" alt="销售冠军" class="rounded-full mb-6 shadow-lg">
+        <h1 class="text-3xl font-bold text-orange-600 mb-4 text-center">销售经验闯关挑战</h1>
+        <p class="text-gray-600 mb-8 text-center">学习销冠成交技巧，赢取专属福利</p>
+        <button onclick="goPage('page2')" class="bg-orange-600 text-white py-3 px-8 rounded-lg text-lg shadow hover:bg-orange-700 transition">
+            开始闯关
+        </button>
+    </div>
+
+    <!-- 答题页1：默认隐藏 -->
+    <div id="page2" class="page p-6 h-screen box-border">
+        <div class="bg-white rounded-xl shadow p-6 mb-6 mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">第1题：面对客户犹豫时，销冠常用的技巧是？</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div onclick="checkAnswer(false, 'page2')" class="p-4 border rounded-lg hover:bg-gray-100 transition">
+                    A. 直接催促客户下单
+                </div>
+                <div onclick="checkAnswer(true, 'page2')" class="p-4 border rounded-lg hover:bg-gray-100 transition">
+                    B. 拆解客户顾虑，举例同类案例成交
+                </div>
+                <div onclick="checkAnswer(false, 'page2')" class="p-4 border rounded-lg hover:bg-gray-100 transition">
+                    C. 放弃跟进，转做其他客户
+                </div>
+            </div>
+        </div>
+        <div id="feedback2" class="hidden text-center text-lg font-bold mb-6"></div>
+        <button id="next2" onclick="goPage('page3')" class="hidden mx-auto bg-orange-600 text-white py-2 px-6 rounded-lg">
+            下一题
+        </button>
+    </div>
+
+    <!-- 答题页2：默认隐藏 -->
+    <div id="page3" class="page p-6 h-screen box-border">
+        <div class="bg-white rounded-xl shadow p-6 mb-6 mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">第2题：销冠维护老客户的核心方法是？</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div onclick="checkAnswer(false, 'page3')" class="p-4 border rounded-lg hover:bg-gray-100 transition">
+                    A. 只在有新品时联系
+                </div>
+                <div onclick="checkAnswer(true, 'page3')" class="p-4 border rounded-lg hover:bg-gray-100 transition">
+                    B. 定期回访，记录客户需求，提供增值建议
+                </div>
+                <div onclick="checkAnswer(false, 'page3')" class="p-4 border rounded-lg hover:bg-gray-100 transition">
+                    C. 送大额礼品，靠利益绑定
+                </div>
+            </div>
+        </div>
+        <div id="feedback3" class="hidden text-center text-lg font-bold mb-6"></div>
+        <button id="next3" onclick="goPage('page4')" class="hidden mx-auto bg-orange-600 text-white py-2 px-6 rounded-lg">
+            查看结果
+        </button>
+    </div>
+
+    <!-- 通关页：默认隐藏 -->
+    <div id="page4" class="page items-center justify-center p-6 h-screen box-border">
+        <img src="https://picsum.photos/150/150" alt="通关" class="rounded-full mb-4">
+        <h2 class="text-2xl font-bold text-orange-600 mb-4 text-center">恭喜通关！</h2>
+        <div class="bg-white rounded-xl shadow p-6 mb-8 max-w-md">
+            <h3 class="text-lg font-bold mb-2">销冠核心经验总结：</h3>
+            <ul class="text-gray-700 space-y-2">
+                <li>✅ 客户犹豫时：先共情，再拆解顾虑，用案例增强信任</li>
+                <li>✅ 老客户维护：高频次轻互动，低频次深服务</li>
+                <li>✅ 成交关键：把产品卖点转化为客户的实际收益</li>
+            </ul>
+        </div>
+        <button onclick="shareWechat()" class="bg-green-600 text-white py-3 px-8 rounded-lg shadow hover:bg-green-700 transition">
+            分享经验给同事
+        </button>
+    </div>
+
+    <script>
+        // 页面切换函数
+        function goPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            // 显示目标页面
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+        }
+
+        // 答题判断函数
+        function checkAnswer(isCorrect, pageId) {
+            const feedbackEl = document.getElementById(`feedback${pageId.slice(-1)}`);
+            const nextBtn = document.getElementById(`next${pageId.slice(-1)}`);
+            
+            if (!feedbackEl || !nextBtn) return;
+
+            // 重置动画和状态
+            feedbackEl.classList.remove('animate-correct', 'animate-error', 'hidden');
+            void feedbackEl.offsetWidth; // 触发重绘
+            
+            if (isCorrect) {
+                feedbackEl.textContent = '回答正确！👍';
+                feedbackEl.className = 'text-green-600 animate-correct text-center text-lg font-bold mb-6';
+                nextBtn.classList.remove('hidden');
+            } else {
+                feedbackEl.textContent = '回答错误，再想想！👎';
+                feedbackEl.className = 'text-red-600 animate-error text-center text-lg font-bold mb-6';
+                nextBtn.classList.add('hidden');
+            }
+        }
+
+        function shareWechat() {
+            alert('已唤起微信分享！（实际需配置微信JS-SDK）');
+        }
+
+        window.onload = function() {
+            document.body.style.paddingBottom = '50px';
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
+    </script>
+</body>
+</html>
